@@ -11,12 +11,15 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     public int sacrificios = 0;
     [SerializeField] private GameObject finalDoor;
+    [SerializeField] private float gameDuration;
 
     [Header("UI")]
     [SerializeField] private GameObject[] characterButtons;
     [SerializeField] private Volume vignetteEffect;
     [SerializeField] private TextMeshProUGUI sacrificiosText;
-    [SerializeField] private GameObject panelGameOver;
+    [SerializeField] private GameObject panelWin;
+    [SerializeField] private GameObject panelLose;
+    [SerializeField] private TextMeshProUGUI timerText;
 
     [Header("Player Sprite")]
     [SerializeField] private SpriteRenderer playerSprite;
@@ -38,11 +41,41 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 0f;
+
+        switch (DifficultyManager.instance.selectedDifficulty)
+        {
+            case "Easy":
+                gameDuration = 1801f;
+                break;
+            case "Medium":
+                gameDuration = 1501f;
+                break;
+            case "Hard":
+                gameDuration = 1201f;
+                break;
+            case "Expert":
+                gameDuration = 901f;
+                break;
+        }
+
     }
 
     private void Update()
     {
         sacrificiosText.text = $"Sacrifícios: {sacrificios}/6";
+
+        if (gameDuration > 0f)
+        {
+            gameDuration -= Time.deltaTime;
+            int minutes = Mathf.FloorToInt(gameDuration / 60f);
+            int seconds = Mathf.FloorToInt(gameDuration % 60f);
+            timerText.text = $"Tempo restante: {minutes:00}:{seconds:00}";
+        }
+        else
+        {
+            YouLose();
+            timerText.text = "Tempo restante: 00:00";
+        }
     }
 
     public void OpenFinalDoor()
@@ -57,7 +90,14 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0f;
         StartCoroutine(FadeOutVignette(1f));
-        panelGameOver.SetActive(true);
+        panelWin.SetActive(true);
+    }
+
+    public void YouLose()
+    {
+        Time.timeScale = 0f;
+        StartCoroutine(FadeOutVignette(1f));
+        panelLose.SetActive(true);
     }
 
     public void BackToMenu()

@@ -9,10 +9,12 @@ public class Player : MonoBehaviour
 
     Rigidbody2D rb;
     Vector2 calib;
+    AudioSource audioSource;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
         if (autoCalibrateOnStart)
             CalibrateNow();
     }
@@ -61,6 +63,7 @@ public class Player : MonoBehaviour
             GameManager.Instance.sacrificios += 1;
             Destroy(other.gameObject);
             GameManager.Instance.OpenFinalDoor();
+            audioSource.Play();
         }
 
         if (other.CompareTag("Coroa"))
